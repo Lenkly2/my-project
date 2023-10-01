@@ -4,9 +4,12 @@ from PyQt5.QtWidgets import (
         QLineEdit, QFormLayout,
         QHBoxLayout, QVBoxLayout, 
         QGroupBox, QButtonGroup, QRadioButton,  
-        QPushButton, QLabel, QSpinBox, QListView, QTextEdit)
+        QPushButton, QLabel, QSpinBox, QListView, QTextEdit, QInputDialog)
+
+import json
 
 app = QApplication([])
+
 
 window = QWidget()
 width = 600
@@ -15,8 +18,6 @@ window.resize(width, height)
 window.move(300, 300)
 window.setWindowTitle('НЕ Розумні замітки')
 
-def savestonot():
-    nerobotaet = "nexyi"
 
 Vline = QVBoxLayout()
 Vline1 = QVBoxLayout()
@@ -38,7 +39,8 @@ Button32 = QPushButton("Шукати замітку по тегу")
 viewl1 = QListWidget()
 viewl2 = QListWidget()
 
-serch = QLineEdit("Введіть тег")
+serch = QLineEdit("")
+serch.setPlaceholderText("Введіть тег")
 
 Vline.addWidget(text)
 Hline.addWidget(Button11)
@@ -63,11 +65,28 @@ Hline3.addLayout(Vline1)
 window.setLayout(Hline3)
 
 
+def shownotes():
+    key = viewl1.selectedItems()[0].text()
+    text.setText(notes[key]["text"])
+
+def addnote():
+    note_name, ok = QInputDialog.getText(window,'додати замітку', "Назва замітки")
+    if note_name and ok != "":
+        notes[note_name] = {"text":"",'tegs':[]}
+        viewl1.addItem(note_name)
+with open("saves.json",'r') as file:
+    notes = json.load(file)
+viewl1.addItems(notes)
+
+def savetext():
+    with open("saves.json","a") as file:
+        notes = json.dump(file)
+    savetext = text.getText()
+
+Button31.clicked.connect(savetext)
 
 
-
-
-
-
+viewl1.itemClicked.connect(shownotes)
+Button11.clicked.connect(addnote)
 window.show()
 app.exec_()
