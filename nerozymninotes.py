@@ -31,16 +31,24 @@ label2 = QLabel("Список тегів")
 Button11 = QPushButton("Створити замітку")
 Button21 = QPushButton("Видалити замітку")
 Button31 = QPushButton("Зберегти замітку")
-
+Button11.setStyleSheet('background: rgb(255,0,0);')
+Button21.setStyleSheet('background: rgb(255,0,0);')
+Button31.setStyleSheet('background: rgb(255,0,0);')
 Button12 = QPushButton("Додати до замітки")
 Button22 = QPushButton("Видалити від заміток")
 Button32 = QPushButton("Шукати замітку по тегу")
+Button12.setStyleSheet('background: rgb(255,0,0);')
+Button22.setStyleSheet('background: rgb(255,0,0);')
+Button32.setStyleSheet('background: rgb(255,0,0);')
+
 
 viewl1 = QListWidget()
 viewl2 = QListWidget()
-
+viewl1.setStyleSheet('background: rgb(255,0,0);')
+viewl2.setStyleSheet('background: rgb(255,0,0);')
 serch = QLineEdit("")
 serch.setPlaceholderText("Введіть тег")
+serch.setStyleSheet('background: rgb(255,0,0);')
 
 Vline.addWidget(text)
 Hline.addWidget(Button11)
@@ -74,19 +82,33 @@ def addnote():
     if note_name and ok != "":
         notes[note_name] = {"text":"",'tegs':[]}
         viewl1.addItem(note_name)
-with open("saves.json",'r') as file:
-    notes = json.load(file)
-viewl1.addItems(notes)
+
 
 def savetext():
-    with open("saves.json","a") as file:
-        notes = json.dump(file)
-    savetext = text.getText()
+    if viewl1.selectedItems():
+        key = viewl1.selectedItems()[0].text()
+        notes[key]["text"] = text.toPlainText()
+        with open("saves.json","w") as file:
+            json.dump(notes,file)
+
+def del_notes():
+    if viewl1.selectedItems():
+        key = viewl1.selectedItems()[0].text()
+        del notes[key]
+        text.clear()
+        viewl1.clear()
+        viewl1.addItems(notes)
+        with open ('saves.json','w') as file:
+            json.dump(notes,file)
+
 
 Button31.clicked.connect(savetext)
-
+Button21.clicked.connect(del_notes)
 
 viewl1.itemClicked.connect(shownotes)
 Button11.clicked.connect(addnote)
 window.show()
+with open("saves.json",'r') as file:
+    notes = json.load(file)
+viewl1.addItems(notes)
 app.exec_()
